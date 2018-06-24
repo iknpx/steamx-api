@@ -63,7 +63,7 @@ class AppsService {
                     .replace('${ID}', person.id);
 
                 const apps = request.get(destination)
-                    .then(data => data.response.games)
+                    .then(data => data.response.games || [])
                     .then(games => games
                         .reduce((result, game) => [...result, game.appid], [])
                         .sort((a, b) => a < b ? -1 : 1)

@@ -1,7 +1,7 @@
 version: "2"
 services:
   app:
-    container_name: api
+    container_name: steamx-api
     restart: always
     build: .
     environment:
