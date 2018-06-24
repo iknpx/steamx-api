@@ -29,7 +29,7 @@ pipeline:
   ssh:
     image: appleboy/drone-ssh
     pull: true
-    host: 185.143.173.198
+    host: [ ssh_host ]
     user: root
     port: 22
     pull: true
