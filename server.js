@@ -9,5 +9,4 @@ const io = Socket(server);
 const worker = new Worker(io);
 
 server.listen(config.get('PORT'));
-
 io.on('connection', service(worker));
