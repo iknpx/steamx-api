@@ -20,8 +20,7 @@ pipeline:
     repo: iknpx/steamx-api
     tags: latest
     secrets: [ docker_username, docker_password, steam_key ]
-    build_args:
-      - STEAM_KEY=${STEAM_KEY}
+    build_args_from_env: [ STEAM_KEY ]
     when:
       branch: [ master, develop ]
       event: [ push ]
