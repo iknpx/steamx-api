@@ -1,0 +1,11 @@
+.idea
+*sublime*
+.DS_Store
+
+*-lock.json
+*.lock
+*.log
+
+dist
+coverage
+node_modules

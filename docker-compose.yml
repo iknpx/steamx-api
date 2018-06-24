@@ -1,0 +1,19 @@
+version: "2"
+services:
+  app:
+    container_name: api
+    restart: always
+    build: .
+    environment:
+      - MONGODB_DB=steamx-api
+      - MONGODB_HOST=mongodb://mongo
+    ports:
+      - 5000:5000
+    links:
+      - mongo
+
+  mongo:
+    container_name: mongo
+    image: mongo
+    volumes:
+      - /data:/data/db

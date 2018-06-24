@@ -1,0 +1,31 @@
+{
+  "name": "steamx-api",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:iknpx/steamx-api.git",
+  "author": "Iakov Salikov <isalikov@exadel.com>",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "dev": "nodemon ./server.js",
+    "start": "node ./server.js",
+    "test": "jest",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "bluebird": "^3.5.1",
+    "colors": "^1.1.2",
+    "mongoose": "^5.0.4",
+    "nconf": "^0.10.0",
+    "request": "^2.87.0",
+    "request-promise": "^4.2.2",
+    "shortid": "^2.2.8",
+    "socket.io": "^2.1.1"
+  },
+  "devDependencies": {
+    "eslint": "^4.18.1",
+    "eslint-config-airbnb-base": "^12.1.0",
+    "eslint-plugin-import": "^2.9.0",
+    "nodemon": "^1.17.5"
+  }
+}
