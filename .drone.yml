@@ -29,12 +29,12 @@ pipeline:
   ssh:
     image: appleboy/drone-ssh
     pull: true
-    host: [ ssh_host ]
+    host: ${SSH_HOST}
     user: root
     port: 22
     pull: true
     command_timeout: 3600
-    secrets: [ ssh_key ]
+    secrets: [ ssh_key, ssh_host ]
     script:
       - cd /etc/api
       - sh deploy.sh
