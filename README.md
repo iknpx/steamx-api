@@ -1,5 +1,7 @@
 # steamx-api
 
+![Build Status](https://drone.dayler.io/api/badges/iknpx/steamx-api/status.svg)
+
 ### Events
 
 * ``'fetch apps' | [<steam app id>]`` - fetch apps details
