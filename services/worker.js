@@ -2,25 +2,27 @@ const Promise = require('bluebird');
 const config = require('../config');
 const request = require('../libs/request');
 const model = require('../models/app.model');
+const inspect = require('../libs/inspect');
 
 class Worker {
     constructor(io) {
         this.io = io;
 
-        this.queque = [];
+        this.queue = [];
         this.inProgress = false;
     }
 
     add(app) {
-        const readyToPush = app.empty && this.queque.findIndex(_app => _app.appid === app.appid) === -1;
-        if (readyToPush && !this.queque.length) {
-            this.queque.push(app);
+        const readyToPush = app.empty && this.queue.findIndex(_app => _app.appid === app.appid) === -1;
+
+        if (readyToPush && !this.queue.length) {
+            this.queue.push(app);
             this.inProgress = true;
             this._exec();
         }
 
         if (readyToPush) {
-            this.queque.push(app);
+            this.queue.push(app);
         }
     }
 
@@ -29,7 +31,7 @@ class Worker {
     }
 
     clear() {
-        this.queque = [];
+        this.queue = [];
     }
 
     _next() {
@@ -39,7 +41,7 @@ class Worker {
     }
 
     _exec() {
-        const app = this.queque.pop();
+        const app = this.queue.pop();
 
         const promise = new Promise((resolve, reject) => {
             setTimeout(() => {
@@ -59,7 +61,7 @@ class Worker {
                 return record.save();
             })
             .then(app => {
-                if (this.queque.length) {
+                if (this.queue.length) {
                     this._next();
                     this.io.emit('resolve next', app);
                 } else {
@@ -67,7 +69,7 @@ class Worker {
                     this.io.emit('resolve done');
                 }
             })
-            .catch(() => this.queque.push(app));
+            .catch(inspect);
     }
 
     _fetchAppDetails(appID) {

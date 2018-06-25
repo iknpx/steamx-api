@@ -12,6 +12,7 @@ class AppsService {
 
         this.fetchApps = this.fetchApps.bind(this);
         this.fetchPersons = this.fetchPersons.bind(this);
+        this.clearApps = this.clearApps.bind(this);
 
         this._touchApp = this._touchApp.bind(this);
         this._fetchPersonApps = this._fetchPersonApps.bind(this);
@@ -33,6 +34,17 @@ class AppsService {
             .then(() => this._fetchPersons(names))
             .map(this._fetchPersonApps)
             .then(apps => this.socket.emit('persons', apps));
+    }
+
+    clearApps(appIDS) {
+        this.worker.stop();
+        this.worker.clear();
+
+        const result = appIDS
+            .map(appid => this.model.deleteOne({ appid }));
+
+        Promise.all(result)
+            .then(() => this.socket.emit('apps deleted', appIDS));
     }
 
     _touchApp(appidPromise) {
@@ -125,4 +137,5 @@ module.exports = worker => socket => {
 
     socket.on('fetch apps', service.fetchApps);
     socket.on('fetch persons', service.fetchPersons);
+    socket.on('clear apps', service.clearApps);
 };
