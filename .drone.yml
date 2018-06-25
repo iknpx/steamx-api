@@ -15,7 +15,7 @@ pipeline:
       branch: [ master, feature/* ]
       event: [ push, pull_request ]
 
-  docker:
+  build-docker-image:
     image: plugins/docker
     repo: iknpx/steamx-api
     tags: latest
@@ -25,7 +25,7 @@ pipeline:
       branch: [ master, develop ]
       event: [ push ]
 
-  ssh:
+  deploy-docker-image:
     image: appleboy/drone-ssh
     pull: true
     host: 159.65.105.48
