@@ -26,14 +26,14 @@ class AppsService {
             .map(this._touchApp);
 
         Promise.all(result)
-            .then(apps => this.socket.emit('apps', apps));
+            .then(apps => this.socket.emit('post::fetch::apps', apps));
     }
 
     fetchPersons(names) {
         Promise.resolve()
             .then(() => this._fetchPersons(names))
             .map(this._fetchPersonApps)
-            .then(apps => this.socket.emit('persons', apps));
+            .then(apps => this.socket.emit('post::fetch::persons', apps));
     }
 
     clearApps(appIDS) {
@@ -44,7 +44,7 @@ class AppsService {
             .map(appid => this.model.deleteOne({ appid }));
 
         Promise.all(result)
-            .then(() => this.socket.emit('apps deleted', appIDS));
+            .then(() => this.socket.emit('post::clear::apps', appIDS));
     }
 
     _touchApp(appidPromise) {
@@ -135,7 +135,7 @@ class AppsService {
 module.exports = worker => socket => {
     const service = new AppsService({ config, socket, model, worker });
 
-    socket.on('fetch apps', service.fetchApps);
-    socket.on('fetch persons', service.fetchPersons);
-    socket.on('clear apps', service.clearApps);
+    socket.on('get::fetch::apps', service.fetchApps);
+    socket.on('get::fetch::persons', service.fetchPersons);
+    socket.on('get::clear::apps', service.clearApps);
 };

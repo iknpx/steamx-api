@@ -1,4 +1,6 @@
 const Promise = require('bluebird');
+const striptags = require('striptags');
+
 const config = require('../config');
 const request = require('../libs/request');
 const model = require('../models/app.model');
@@ -15,7 +17,7 @@ class Worker {
     add(app) {
         const readyToPush = app.empty && this.queue.findIndex(_app => _app.appid === app.appid) === -1;
 
-        if (readyToPush && !this.queue.length) {
+        if (readyToPush && this.queue.length <= 1) {
             this.queue.push(app);
             this.inProgress = true;
             this._exec();
@@ -45,7 +47,7 @@ class Worker {
 
         const promise = new Promise((resolve, reject) => {
             setTimeout(() => {
-                this._fetchAppDetails(app.appid)
+                this._fetchSteamSpyDetails(app.appid)
                     .then(resolve)
                     .catch(reject);
             }, config.get('STEAMSPYAPI:DELAY'));
@@ -58,27 +60,66 @@ class Worker {
             }))
             .then(({ result, record }) => {
                 Object.assign(record, result, { empty: false });
+
                 return record.save();
             })
             .then(app => {
                 if (this.queue.length) {
                     this._next();
-                    this.io.emit('resolve next', app);
+                    this.io.emit('post::fetch::app', app);
                 } else {
                     this.inProgress = false;
-                    this.io.emit('resolve done');
+                    this.io.emit('post::fetch::queue::empty');
                 }
             })
-            .catch(inspect);
+            .catch(error => {
+                inspect(error);
+
+                // this.queue.push(app);
+                if (this.queue.length) {
+                    this._next();
+                }
+            });
     }
 
-    _fetchAppDetails(appID) {
+    _fetchSteamSpyDetails(appID) {
         return request.get(config.get('STEAMSPYAPI:GAME_DETAILS').replace('${ID}', appID))
             .then(steamspy => ({
                 appid: appID,
                 name: steamspy.name,
                 multiplayer: Object.keys(steamspy.tags).findIndex(tag => tag === 'Multiplayer') !== -1,
                 empty: false,
+            }))
+            .then(steamspyApp => Promise.props({
+                steamspyApp,
+                steamApp: this._fetchSteamDetails(appID),
+            }))
+            .then(({ steamspyApp, steamApp }) => ({ ...steamspyApp, ...steamApp }));
+    }
+
+    _fetchSteamDetails(appID) {
+        return request.get(config.get('STEAM:API:GET_GAME_DETAILS').replace('${ID}', appID))
+            .then(result => result[appID])
+            .then(response => {
+                const data = response && response.success ? response.data : {};
+
+                return {
+                    short_description: 'no description',
+                    header_image: config.get('IMAGEPLACEHOLDER'),
+                    recommendations: { total: -1 },
+                    screenshots: [{ path_full: config.get('IMAGEPLACEHOLDER') }],
+                    release_date: { date: 'no date ' },
+                    ...data,
+                };
+            })
+            .then(data => ({
+                description: striptags(data.short_description || data.detailed_description)
+                    .replace('&quot;', '')
+                    .replace('&reg;', ''),
+                image: data.header_image,
+                score: data.recommendations.total,
+                bg: data.screenshots[0].path_full,
+                date: data.release_date.date,
             }));
     }
 }

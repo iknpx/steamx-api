@@ -14,6 +14,11 @@ const appSchema = new mongoose.Schema({
         type: Boolean,
         default: true,
     },
+    description: String,
+    image: String,
+    score: Number,
+    bg: String,
+    date: String,
 }, { timestamps: true, id: false });
 
 module.exports = mongoose.model('apps', appSchema);
