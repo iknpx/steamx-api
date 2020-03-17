@@ -4,7 +4,7 @@ const inspect = require('./inspect');
 const log = require('./log');
 const config = require('../config');
 
-const CONNECTION_STRING = `${config.get('MONGODB:HOST')}/${config.get('MONGODB:DB')}`;
+const CONNECTION_STRING = config.get('MONGODB:URI');
 
 mongoose.Promise = require('bluebird');
 mongoose

@@ -3,8 +3,7 @@
     "PORT": 5000,
     "LOGGER": "dev",
     "MONGODB": {
-        "DB": "steamx-api",
-        "HOST": "mongodb://localhost:27017",
+        "URI": "mongodb://localhost:27017/steamxapi",
         "OPTIONS": {
             "autoReconnect": true,
             "reconnectTries": 1000,
